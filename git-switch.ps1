@@ -1,3 +1,10 @@
+#about_Execution_Policies
+#https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_execution_policies?view=powershell-7.4
+
+# To run git-switch.ps1, set: Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+#
+# To remove run: Set-ExecutionPolicy -ExecutionPolicy Undefined -Scope CurrentUser
+
 function Show-Menu {
     param (
         [string]$Title = 'Choose an Option'
