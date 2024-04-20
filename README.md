@@ -12,6 +12,7 @@
 
 ---
 # 🔧 Git-Switch
+# For Linux 🐧
 ```
 wget https://github.com/PhilipMello/scripts/blob/main/git-switch && chmod +x git-switch
 ```
@@ -29,8 +30,16 @@ To run in Pipeline:
 ```
 ./git-switch --account1 OR ./git-switch --account2
 ```
-
 ---
+# For Windows 🪟
+```
+wget https://github.com/PhilipMello/scripts/blob/main/git-switch.ps1
+```
+RUN:
+```
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser && ./git-switch.ps1
+```
+
 ## 🔧 Switch Github Account
 ![](assets/img/github-account-switch.gif)
 
