@@ -9,7 +9,7 @@
     - 🔖 [Test Github SSH connection](#-test-github-ssh-connection)<br>
     - 🔖 [Set Github account](#-set-github-account)<br>
     - 🔖 [Fix file permissions](#-fix-file-permissions)<br>
-- ### ❗REQUIREMENTS❗
+- ### ❗REQUIREMENTS FOR EXISTING ACCOUNTS❗
 - Generate SSH key for account 1
     - Rename SSH Key for account 1: 
     ```bash 
