@@ -27,7 +27,7 @@ echo "
 # How to use: Execute ./git-switch
 # Exemples:
 # Manual: ./git-switch -h OR ./git-switch--h OR ./git-switch --help
-# Change account using parameter: ./git-switch --account1
+# Switch account using parameter: ./git-switch --account1
 # --------------------------------------------------------------
 "
 WHITE=""

@@ -13,11 +13,13 @@
 - Generate SSH key for account 1
     - Rename SSH Key for account 1: 
     ```bash 
+    mv ~/.ssh/id_ed25519.pub ~/.ssh/id_ed25519_account1.pub
     mv ~/.ssh/id_ed25519 ~/.ssh/id_ed25519_account1
     ```
 - Generate SSH key for account 2
     - Rename SSH Key for account 2: 
     ```bash 
+    mv ~/.ssh/id_ed25519.pub ~/.ssh/id_ed25519_account2.pub
     mv ~/.ssh/id_ed25519 ~/.ssh/id_ed25519_account2
     ```
    
