@@ -27,7 +27,7 @@
 # 🔧 Git-Switch
 # For Linux 🐧
 ```
-wget hhttps://raw.githubusercontent.com/PhilipMello/git-switch/main/gswitch && chmod +x gswitch
+wget https://raw.githubusercontent.com/PhilipMello/git-switch/main/gswitch && chmod +x gswitch
 ```
 RUN:
 ```
