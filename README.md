@@ -50,7 +50,7 @@ wget https://github.com/PhilipMello/scripts/blob/main/gswitch.ps1
 ```
 RUN:
 ```
-Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser && ./git-switch.ps1
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser && ./gswitch.ps1
 ```
 
 ## 🔧 Switch Github Account
