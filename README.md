@@ -27,26 +27,26 @@
 # 🔧 Git-Switch
 # For Linux 🐧
 ```
-wget hhttps://raw.githubusercontent.com/PhilipMello/git-switch/main/git-switch && chmod +x git-switch
+wget hhttps://raw.githubusercontent.com/PhilipMello/git-switch/main/gswitch && chmod +x gswitch
 ```
 RUN:
 ```
-./git-switch
+./gswitch
 ```
 
 Manual:
 ```
-./git-switch -h
+./gswitch -h
 ```
 
 To run in Pipeline:
 ```
-./git-switch --account1 OR ./git-switch --account2
+./gswitch --account1 OR ./giswitch --account2
 ```
 ---
 # For Windows 🪟
 ```
-wget https://github.com/PhilipMello/scripts/blob/main/git-switch.ps1
+wget https://github.com/PhilipMello/scripts/blob/main/gswitch.ps1
 ```
 RUN:
 ```
