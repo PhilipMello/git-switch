@@ -29,6 +29,13 @@
 ```
 wget https://raw.githubusercontent.com/PhilipMello/git-switch/main/gswitch && chmod +x gswitch
 ```
+
+OR
+
+```
+wget https://raw.githubusercontent.com/PhilipMello/git-switch/main/gswitch && chmod +x gswitch && sudo mv gswitch /usr/bin/
+```
+
 RUN:
 ```
 ./gswitch
