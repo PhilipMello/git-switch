@@ -139,6 +139,11 @@ function github_fix_permissions() {
     "
 }
 
+function github_show_config() {
+    echo "Run gSwitch in git directory level"
+    cat .git/config | grep -E "name|email"
+}
+
 # <-- Manual - BEGIN
 manual() {
     echo "Generate 2 SSH Keys and rename Github account to
@@ -177,6 +182,7 @@ echo "2. Generate SSH Key"
 echo "3. Test Github SSH connection"
 echo "4. Set Github account"
 echo "5. Fix SSH file permissions"
+echo "6. Show current GitHub config"
 read option
 
 case $option in
@@ -194,6 +200,9 @@ case $option in
         ;;
     5)
         github_fix_permissions
+        ;;
+    6)
+        github_show_config
         ;;
     *)
         echo "Invalid option"
