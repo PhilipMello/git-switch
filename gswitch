@@ -2,32 +2,35 @@
 # Author
 author="Philip Mello <@Microsoft>"
 # Version
-version="1.0"
+version="1.1"
 # License
 license="MIT"
 # Date
 current_date=$(date +'%b %d, %Y')
 # GitHub
-github='https://github.com/PhilipMello/scripts/'
-github2='https://github.com/AtomyCloud/scripts/'
-# Microsoft Official Documentation
-microsoft=''
+github='https://github.com/PhilipMello/git-switch'
+
+script="GitHub Account Switch"
+description="2 Github Accounts into one CLI"
+
 echo "
+        _____         _ _       _     
+       / ____|       (_) |     | |      $version
+  __ _| (_____      ___| |_ ___| |__    $current_date
+ / _. |\___ \ \ /\ / / | __/ __| |_ \   $author
+| (_| |____) \ V  V /| | || (__| | | |  $license
+ \___ |_____/ \_/\_/ |_|\__\___|_| |_|
+  __/ |                               
+ |___/  $github                            
+
 # --------------------------------------------------------------
-# Script     : Git Account Switch
-# Description: 2 Github Accounts in one CLI
-# Version    : $version
-# Date       : $current_date
-# Author     : $author
-# License    : $license
-# Github     : $github
-# Github     : $github2
-# Microsoft  : $microsoft
+# Script     : $script
+# Description: $description
 # --------------------------------------------------------------
-# How to use: Execute ./git-switch
+# How to use: Execute gswitch
 # Exemples:
-# Manual: ./git-switch -h OR ./git-switch--h OR ./git-switch --help
-# Switch account using parameter: ./git-switch --account1
+# Manual: gswitch -h OR gswitch --h OR gswitch --help
+# Switch account using parameter: gswitch --account1
 # --------------------------------------------------------------
 "
 WHITE=""
@@ -53,7 +56,11 @@ function github_generate_sshkey() {
     1)
         read -p "Type your github email account": github_email_account
         ssh-keygen -t ed25519 -C "$github_email_account"
-        echo "SSH key successfuly generated"
+        echo -e "
+        +-----------------------------------------------------------+
+        |${GREEN}SSH key successfuly generated${ENDCOLOR}
+        +-----------------------------------------------------------+
+        "
         cat ~/.ssh/id_ed25519.pub
         ;;
     2)
@@ -61,7 +68,11 @@ function github_generate_sshkey() {
         ssh-keygen -t ed25519 -C "$github_email_account1" -f ~/.ssh/id_ed25519_account1
         read -p "Type your github email account2": github_email_account2
         ssh-keygen -t ed25519 -C "$github_email_account2" -f ~/.ssh/id_ed25519_account2
-        echo "SSH keys successfuly generated"
+        echo -e "
+        +-----------------------------------------------------------+
+        |${GREEN}SSH key successfuly generated${ENDCOLOR}
+        +-----------------------------------------------------------+
+        "
         cat ~/.ssh/id_ed25519_account1.pub
         cat ~/.ssh/id_ed25519_account2.pub
         ;;
@@ -121,19 +132,27 @@ function github_fix_permissions() {
     chmod 600  ~/.ssh/id_ed25519_account1.pub
     chmod 600  ~/.ssh/id_ed25519_account2
     chmod 600  ~/.ssh/id_ed25519_account2.pub
-    echo "Files permissions has been fixed"
+    echo -e "
+    +-----------------------------------------------------------+
+    |${GREEN}Files permissions has been fixed${ENDCOLOR}
+    +-----------------------------------------------------------+
+    "
 }
 
-# <---
-
-# Manual and Pipeline
+# <-- Manual - BEGIN
 manual() {
-echo "Generate 2 SSH Keys and rename Github account to
-id_ed25519_account1 and Github account 2 to id_ed25519_account2
-in ~/.ssh
-"
-exit 0
+    echo "Generate 2 SSH Keys and rename Github account to
+    id_ed25519_account1 and Github account 2 to id_ed25519_account2
+    in ~/.ssh
+    "
+    echo -e "Parameters:
+    --account1          Switch to GitHub Account 1
+    --account2          Switch to GitHub Account 2
+    "
+    exit 0
 }
+
+# Manual - END -->
 
 if [[ $1 == "-h" || $1 == "--help" || $1 == "--h" ]]; then
     manual
@@ -151,8 +170,6 @@ elif [[ $1 == "--account2" ]]; then
     ssh -T git@github.com
     exit 0
 fi
-
-# --->
 
 echo "Choose an option:"
 echo "1. Switch GitHub Account"
