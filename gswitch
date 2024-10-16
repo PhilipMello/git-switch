@@ -2,7 +2,7 @@
 # Author
 author="Philip Mello <@Microsoft>"
 # Version
-version="1.1"
+version="1.2"
 # License
 license="MIT"
 # Date
@@ -43,40 +43,39 @@ RED="\033[97;41m"
 ENDCOLOR="\e[0m"
 
 function github_generate_sshkey() {
-    # Generate SSH Key
     echo "Go to your GitHub Portal and add your SSH Key
     'https://github.com/settings/ssh/new'
     "
-    echo "Choose an option:"
-    echo "1. Generate SSH Key for single account"
-    echo "2. Generate SSH Key for 2 accounts"
-    read option
 
-    case $option in
-    1)
-        read -p "Type your github email account": github_email_account
-        ssh-keygen -t ed25519 -C "$github_email_account"
-        echo -e "
+    # Prompt user for the number of accounts to create
+    read -p "How many GitHub accounts do you want to create (0-9)? " num_accounts
+
+    # Validate the input for the number of accounts
+    if ! [[ "$num_accounts" =~ ^[0-9]+$ ]] || [ "$num_accounts" -lt 0 ] || [ "$num_accounts" -gt 9 ]; then
+    echo "Invalid number. Please enter a number between 0 and 9."
+    exit 1
+    fi
+
+    # Prompt user to create the specified number of accounts
+    for ((i = 0; i < num_accounts; i++)); do
+    read -p "Type your GitHub email account for account #$i: " github_email_account
+
+    # Validate email format (basic check)
+    if [[ ! "$github_email_account" =~ ^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$ ]]; then
+        echo "Invalid email format. Please try again."
+        continue
+    fi
+
+    # Generate the SSH key with the provided email and a custom filename
+    ssh-keygen -t ed25519 -C "$github_email_account" -f "$HOME/.ssh/id_ed25519_account_$i"
+
+    echo -e "
         +-----------------------------------------------------------+
-        |${GREEN}SSH key successfuly generated${ENDCOLOR}
+        |${GREEN}SSH key generated for: $github_email_account${ENDCOLOR}
+        |${GREEN}Key saved as: $HOME/.ssh/id_ed25519_account_$i${ENDCOLOR}
         +-----------------------------------------------------------+
         "
-        cat ~/.ssh/id_ed25519.pub
-        ;;
-    2)
-        read -p "Type your github email account1": github_email_account1
-        ssh-keygen -t ed25519 -C "$github_email_account1" -f ~/.ssh/id_ed25519_account1
-        read -p "Type your github email account2": github_email_account2
-        ssh-keygen -t ed25519 -C "$github_email_account2" -f ~/.ssh/id_ed25519_account2
-        echo -e "
-        +-----------------------------------------------------------+
-        |${GREEN}SSH key successfuly generated${ENDCOLOR}
-        +-----------------------------------------------------------+
-        "
-        cat ~/.ssh/id_ed25519_account1.pub
-        cat ~/.ssh/id_ed25519_account2.pub
-        ;;
-    esac
+    done
 }
 
 function github_connection_test() {
@@ -95,32 +94,41 @@ function github_set_account() {
 
 function github_account_switch() {
     # Github Account Switch (2 Accounts)
-    github_account1=$(cat ~/.ssh/id_ed25519_account1.pub | grep -E -o "\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,6}\b")
-    github_account2=$(cat ~/.ssh/id_ed25519_account2.pub | grep -E -o "\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,6}\b")
     echo -e "You're logged in as:\n"
     ssh -T git@github.com
-    echo "Choose an option:"
-    echo "1. Switch to Account: $github_account1"
-    echo "2. Switch to Account: $github_account2"
-    read option
 
-    case $option in
-    1)
-        cp ~/.ssh/id_ed25519_account1 ~/.ssh/id_ed25519
-        cp ~/.ssh/id_ed25519_account1.pub ~/.ssh/id_ed25519.pub
-        echo -e "Github Account #1 Selected!\n"
-        ssh -T git@github.com
-        ;;
-    2)
-        cp ~/.ssh/id_ed25519_account2 ~/.ssh/id_ed25519
-        cp ~/.ssh/id_ed25519_account2.pub ~/.ssh/id_ed25519.pub
-        echo -e "Github Account #2 Selected!\n"
-        ssh -T git@github.com
-        ;;
-    *)
-        echo "Invalid option. Please select 1 or 2."
-        ;;
-esac
+    emails=()
+    files=()
+
+    while IFS=: read -r file email; do
+    emails+=("$email")
+    files+=("$(basename "$file")")
+    done < <(grep -H -Eo '[A-Za-z0-9._%+-]+@([A-Za-z0-9._%+-]+)?' ~/.ssh/id_* 2>/dev/null)
+
+    if [ ${#emails[@]} -eq 0 ]; then
+    echo "No accounts found."
+    exit 1
+    fi
+
+    echo "Select an email:"
+    for i in "${!emails[@]}"; do
+    echo "$((i+1)). ${emails[i]}"
+    done
+
+    read -p "Enter the number of your account: " choice
+
+    if ! [[ "$choice" =~ ^[0-9]+$ ]] || [ "$choice" -lt 1 ] || [ "$choice" -gt "${#emails[@]}" ]; then
+    echo "Invalid choice. Exiting."
+    exit 1
+    fi
+
+    selected_email=${emails[$((choice-1))]}
+    selected_file=${files[$((choice-1))]}
+
+    echo -e "Github Account $selected_email Selected!\n"
+    cp ~/.ssh/$selected_file ~/.ssh/id_ed25519.pub
+    ssh -T git@github.com
+
 }
 
 function github_fix_permissions() {
@@ -128,10 +136,7 @@ function github_fix_permissions() {
     echo "Fixing SSH file permissions..."
     chown $USER:$USER -R  ~/.ssh
     chmod 700  ~/.ssh/
-    chmod 600  ~/.ssh/id_ed25519_account1
-    chmod 600  ~/.ssh/id_ed25519_account1.pub
-    chmod 600  ~/.ssh/id_ed25519_account2
-    chmod 600  ~/.ssh/id_ed25519_account2.pub
+    chmod 600  ~/.ssh/id_*
     echo -e "
     +-----------------------------------------------------------+
     |${GREEN}Files permissions has been fixed${ENDCOLOR}
@@ -142,6 +147,15 @@ function github_fix_permissions() {
 function github_show_config() {
     echo "Run gSwitch in git directory level"
     cat .git/config | grep -E "name|email"
+}
+
+function github_show_accounts() {
+    # Show account in ~/.ssh
+    cat ~/.ssh/id_* | grep -Eo '[A-Za-z0-9._%+-]+@([A-Za-z0-9._%+-]+)?' | while read -r email; do
+    echo "-----------------------------------------"
+    echo "| Email: $email |"
+    echo "-----------------------------------------"
+done
 }
 
 # <-- Manual - BEGIN
@@ -183,6 +197,7 @@ echo "3. Test Github SSH connection"
 echo "4. Set Github account"
 echo "5. Fix SSH file permissions"
 echo "6. Show current GitHub config"
+echo "7. Show Account in: ~/.ssh"
 read option
 
 case $option in
@@ -203,6 +218,9 @@ case $option in
         ;;
     6)
         github_show_config
+        ;;
+    7)
+        github_show_accounts
         ;;
     *)
         echo "Invalid option"
