@@ -11,7 +11,7 @@ current_date=$(date +'%b %d, %Y')
 github='https://github.com/PhilipMello/git-switch'
 
 script="GitHub Account Switch"
-description="2 Github Accounts into one CLI"
+description="Multiple Github Accounts into one CLI"
 
 echo "
         _____         _ _       _     
