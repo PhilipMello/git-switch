@@ -135,8 +135,7 @@ function github_fix_permissions() {
     # Git fix files permissions
     echo "Fixing SSH file permissions..."
     chown $USER:$USER -R  ~/.ssh
-    chmod 700  ~/.ssh/
-    chmod 600  ~/.ssh/id_*
+    chmod 600  ~/.ssh/*
     echo -e "
     +-----------------------------------------------------------+
     |${GREEN}Files permissions has been fixed${ENDCOLOR}
