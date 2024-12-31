@@ -93,7 +93,7 @@ function github_set_account() {
 }
 
 function github_account_switch() {
-    # Github Account Switch (2 Accounts)
+    # GitHub Account Switch (2 Accounts)
     echo -e "You're logged in as:\n"
     ssh -T git@github.com
 
@@ -101,34 +101,44 @@ function github_account_switch() {
     files=()
 
     while IFS=: read -r file email; do
-    emails+=("$email")
-    files+=("$(basename "$file")")
+        emails+=("$email")
+        files+=("$(basename "$file")")
     done < <(grep -H -Eo '[A-Za-z0-9._%+-]+@([A-Za-z0-9._%+-]+)?' ~/.ssh/id_* 2>/dev/null)
 
     if [ ${#emails[@]} -eq 0 ]; then
-    echo "No accounts found."
-    exit 1
+        echo "No accounts found."
+        exit 1
     fi
 
     echo "Select an email:"
     for i in "${!emails[@]}"; do
-    echo "$((i+1)). ${emails[i]}"
+        echo "$((i+1)). ${emails[i]}"
     done
 
     read -p "Enter the number of your account: " choice
 
     if ! [[ "$choice" =~ ^[0-9]+$ ]] || [ "$choice" -lt 1 ] || [ "$choice" -gt "${#emails[@]}" ]; then
-    echo "Invalid choice. Exiting."
-    exit 1
+        echo "Invalid choice. Exiting."
+        exit 1
     fi
 
     selected_email=${emails[$((choice-1))]}
     selected_file=${files[$((choice-1))]}
 
-    echo -e "Github Account $selected_email Selected!\n"
-    cp ~/.ssh/$selected_file ~/.ssh/id_ed25519.pub
-    ssh -T git@github.com
+    # Remove the "id_" prefix from the filename
+    stripped_file_prefix=${selected_file#id_}
 
+    # Remove the ".pub" suffix from the filename
+    stripped_file_suffix=${selected_file%.pub}
+
+    echo -e "GitHub Account $selected_email Selected!\n"
+    
+    # Copy the selected private and public key files with stripped filename
+    cp ~/.ssh/$stripped_file_suffix ~/.ssh/id_ed25519
+    cp ~/.ssh/$selected_file ~/.ssh/id_ed25519.pub
+
+    # Test SSH connection
+    ssh -T git@github.com
 }
 
 function github_fix_permissions() {
