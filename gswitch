@@ -167,6 +167,89 @@ function github_show_accounts() {
 done
 }
 
+function backup_ssh_folder() {
+    # Get the current date and time for the backup filename
+    timestamp=$(date +"%Y-%m-%d_%H-%M-%S")
+    backup_name="ssh_backup_$timestamp.tar.gz"
+
+    # Prompt user to choose a storage device
+    echo "Available devices for storage:"
+    devices=("/mnt/*") # Assuming devices are mounted in /mnt
+    for i in "${!devices[@]}"; do
+        echo "$((i+1)). ${devices[i]}"
+    done
+    echo "$(( ${#devices[@]} + 1 )). Save to ~/Desktop/ssh_backup (default)"
+
+    read -p "Choose a storage device (1-${#devices[@]} or press Enter for default): " choice
+
+    # Determine the backup location
+    if [[ -z "$choice" || "$choice" -lt 1 || "$choice" -gt "$(( ${#devices[@]} + 1 ))" ]]; then
+        backup_location=~/Desktop/ssh_backup
+    else
+        backup_location="${devices[$((choice-1))]}"
+    fi
+
+    # Ensure the backup location exists
+    mkdir -p "$backup_location"
+
+    # Create the backup
+    tar -czf "$backup_location/$backup_name" -C ~/.ssh .
+
+    echo "Backup saved to $backup_location/$backup_name"
+}
+
+function restore_ssh_folder() {
+    # Prompt user for the location of backup files
+    echo "Enter the directory where backups are stored, or press Enter to use ~/Desktop:"
+    read -p "Backup directory: " backup_location
+
+    # Use ~/Desktop as default location
+    if [[ -z "$backup_location" ]]; then
+        backup_location=~/Desktop/ssh_backup
+    fi
+
+    # List available backup files
+    echo "Searching for backup files in $backup_location..."
+    backup_files=("$backup_location"/*.tar.gz)
+    
+    if [[ ${#backup_files[@]} -eq 0 ]]; then
+        echo "No backup files found in $backup_location."
+        return
+    fi
+
+    echo "Available backup files:"
+    for i in "${!backup_files[@]}"; do
+        echo "$((i+1)). ${backup_files[i]}"
+    done
+
+    read -p "Choose a file to restore (1-${#backup_files[@]}): " choice
+
+    if ! [[ "$choice" =~ ^[0-9]+$ ]] || [ "$choice" -lt 1 ] || [ "$choice" -gt "${#backup_files[@]}" ]; then
+        echo "Invalid choice. Exiting."
+        return
+    fi
+
+    selected_file="${backup_files[$((choice-1))]}"
+
+    # Confirm restore
+    echo "You selected: $selected_file"
+    read -p "This will overwrite your current ~/.ssh folder. Are you sure? (y/n): " confirm
+    if [[ "$confirm" != "y" ]]; then
+        echo "Restore cancelled."
+        return
+    fi
+
+    # Extract the backup
+    tar -xzf "$selected_file" -C ~/
+
+    echo "Restore complete. ~/.ssh folder restored from $selected_file."
+}
+
+function ssh_options() {
+    read -p "Choose an option (1: Backup, 2: Restore): " option
+    [[ "$option" == "1" ]] && backup_ssh_folder || ([[ "$option" == "2" ]] && restore_ssh_folder || echo "Invalid option.")
+}
+
 # <-- Manual - BEGIN
 manual() {
     echo "Generate 2 SSH Keys and rename Github account to
@@ -207,6 +290,7 @@ echo "4. Set Github account"
 echo "5. Fix SSH file permissions"
 echo "6. Show current GitHub config"
 echo "7. Show Account in: ~/.ssh"
+echo "8. Backup or Restore SSH folder: ~/.ssh"
 read option
 
 case $option in
@@ -230,6 +314,9 @@ case $option in
         ;;
     7)
         github_show_accounts
+        ;;
+    8)
+        ssh_options
         ;;
     *)
         echo "Invalid option"
