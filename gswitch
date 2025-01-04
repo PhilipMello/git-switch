@@ -155,7 +155,7 @@ function github_fix_permissions() {
 
 function github_show_config() {
     echo "Run gSwitch in git directory level"
-    cat .git/config | grep -E "name|email"
+    grep -E "name|email" .git/config
 }
 
 function github_show_accounts() {
