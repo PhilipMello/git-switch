@@ -168,13 +168,21 @@ done
 }
 
 function backup_ssh_folder() {
+    # Get the current username
+    current_user=$(whoami)
+
     # Get the current date and time for the backup filename
     timestamp=$(date +"%Y-%m-%d_%H-%M-%S")
-    backup_name="ssh_backup_$timestamp.tar.gz"
+    backup_name="ssh_backup_"$current_user"_$timestamp.tar.gz"
+
+    # Define the mount point directory
+    mount_dir="/media/$current_user"
 
     # Prompt user to choose a storage device
     echo "Available devices for storage:"
-    devices=("/mnt/*") # Assuming devices are mounted in /mnt
+    # List all devices in the mount directory
+    devices=("$mount_dir"/*)
+
     for i in "${!devices[@]}"; do
         echo "$((i+1)). ${devices[i]}"
     done
