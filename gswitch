@@ -201,26 +201,42 @@ function backup_ssh_folder() {
     mkdir -p "$backup_location"
 
     # Create the backup
-    tar -czf "$backup_location/$backup_name" -C ~/.ssh .
+    tar -czf "$backup_location/$backup_name" -C ~ .ssh
 
     echo "Backup saved to $backup_location/$backup_name"
 }
 
 function restore_ssh_folder() {
-    # Prompt user for the location of backup files
-    echo "Enter the directory where backups are stored, or press Enter to use ~/Desktop:"
-    read -p "Backup directory: " backup_location
+    # Get the current username
+    current_user=$(whoami)
 
-    # Use ~/Desktop as default location
-    if [[ -z "$backup_location" ]]; then
+    # Define the mount point directory
+    mount_dir="/media/$current_user"
+
+    # Prompt user to choose a storage device
+    echo "Available devices for storage:"
+    # List all devices in the mount directory
+    devices=("$mount_dir"/*)
+
+    for i in "${!devices[@]}"; do
+        echo "$((i+1)). ${devices[i]}"
+    done
+    echo "$(( ${#devices[@]} + 1 )). ~/Desktop/ssh_backup (default)"
+
+    read -p "Choose a storage device (1-${#devices[@]} or press Enter for default): " choice
+
+    # Determine the backup restore location
+    if [[ -z "$choice" || "$choice" -lt 1 || "$choice" -gt "$(( ${#devices[@]} + 1 ))" ]]; then
         backup_location=~/Desktop/ssh_backup
+    else
+        backup_location="${devices[$((choice-1))]}"
     fi
 
     # List available backup files
     echo "Searching for backup files in $backup_location..."
     backup_files=("$backup_location"/*.tar.gz)
     
-    if [[ ${#backup_files[@]} -eq 0 ]]; then
+    if [[ ${#backup_files[@]} -eq 0 || "${backup_files[0]}" == "$backup_location/*.tar.gz" ]]; then
         echo "No backup files found in $backup_location."
         return
     fi
@@ -248,7 +264,7 @@ function restore_ssh_folder() {
     fi
 
     # Extract the backup
-    tar -xzf "$selected_file" -C ~/
+    tar -xzf "$selected_file" -C ~
 
     echo "Restore complete. ~/.ssh folder restored from $selected_file."
 }
