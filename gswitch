@@ -271,7 +271,10 @@ function restore_ssh_folder() {
 
 function ssh_options() {
     read -p "Choose an option (1: Backup, 2: Restore): " option
-    [[ "$option" == "1" ]] && backup_ssh_folder || ([[ "$option" == "2" ]] && restore_ssh_folder || echo "Invalid option.")
+    
+    [[ "$option" == "1" ]] && backup_ssh_folder \
+    || ([[ "$option" == "2" ]] && restore_ssh_folder \
+    || echo "Invalid option.")
 }
 
 # <-- Manual - BEGIN
