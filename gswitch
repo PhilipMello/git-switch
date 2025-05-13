@@ -278,35 +278,80 @@ function ssh_options() {
 }
 
 # <-- Manual - BEGIN
+
 manual() {
-    echo "Generate 2 SSH Keys and rename Github account to
-    id_ed25519_account1 and Github account 2 to id_ed25519_account2
-    in ~/.ssh
-    "
-    echo -e "Parameters:
+    echo -e "
+    ##############################################################
+    #                        Manual                              #
+    ##############################################################
+    
+    Option #1
+    Switch Github Account.
+    ----------------------
+
+    Option #2
+    Generate SSH Key.
+    ----------------------
+
+    Option #3
+    Test Github SSH Connection, showing the current user logged in.
+    ----------------------
+
+    Option #4
+    Set Github Account in current directory.
+    ---------------------------
+
+    Option #5
+    Fix SSH file permissions.
+
+    For manual fixing: chmod 600  ~/.ssh/*
+    Check permission by using: ls -lrht  ~/.ssh/*
+    the correct output should be: -rw-------
+    ---------------------------
+
+    Option #6
+    Show current GitHub account details.
+    ---------------------------
+
+    Option #7
+    Show All Account in: ~/.ssh
+    ---------------------------
+
+    Option #8
+    Backup or Restore SSH folder: ~/.ssh
+    ---------------------------
+    
+    Parameters:
     --account1          Switch to GitHub Account 1
     --account2          Switch to GitHub Account 2
+    
+    ---------------------------
+    
+    ##############################################################
+    # For more information or to report issues, visit the GitHub: #
+    # $github                   #
+    ##############################################################
     "
     exit 0
 }
 
+if [[ $1 == "-h" || $1 == "--help" || "$1" == "--h" ]]; then
+    manual
+fi
+
 # Manual - END -->
 
-if [[ $1 == "-h" || $1 == "--help" || $1 == "--h" ]]; then
-    manual
-    exit 1
-elif [[ $1 == "--account1" ]]; then
+
+if [[ $1 == "--account1" ]]; then
     cp ~/.ssh/id_ed25519_account1 ~/.ssh/id_ed25519
     cp ~/.ssh/id_ed25519_account1.pub ~/.ssh/id_ed25519.pub
     echo -e "Github Account #1 has been selected!\n"
     ssh -T git@github.com
-    exit 0
 elif [[ $1 == "--account2" ]]; then
     cp ~/.ssh/id_ed25519_account2 ~/.ssh/id_ed25519
     cp ~/.ssh/id_ed25519_account2.pub ~/.ssh/id_ed25519.pub
     echo -e "Github Account #2 has been selected!\n"
     ssh -T git@github.com
-    exit 0
 fi
 
 echo "Choose an option:"
